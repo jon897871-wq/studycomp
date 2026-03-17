@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peer Support Canada — Competency Study Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F6FA;
+    --surface: #FFFFFF;
+    --text: #1A1F2E;
+    --muted: #5A6480;
+    --hint: #9AA3BE;
+    --border: #DDE2EF;
+    --blue: #1E3A8A;
+    --blue-mid: #2D55C8;
+    --blue-light: #E8EDFB;
+    --blue-hover: #162D6E;
+    --green: #7DBD2C;
+    --green-light: #EEF7DC;
+    --green-mid: #5C9A1A;
+    --success-bg: #EEF7DC;
+    --success: #4A7C10;
+    --danger-bg: #FDEEE8;
+    --danger: #B83A1A;
+    --reveal-bg: #E8EDFB;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'Instrument Sans', sans-serif;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 4rem;
+  }
+
+  .site-header {
+    width: 100%;
+    background: var(--blue);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 2rem;
+  }
+
+  .bubble-green {
+    width: 26px; height: 26px;
+    background: var(--green);
+    border-radius: 50% 50% 0 50%;
+    flex-shrink: 0;
+  }
+
+  .bubble-blue-lt {
+    width: 34px; height: 34px;
+    background: #3B6FE0;
+    border-radius: 50% 50% 50% 0;
+    flex-shrink: 0;
+    margin-bottom: 3px;
+  }
+
+  .logo-pair { display: flex; align-items: flex-end; gap: 3px; margin-right: 4px; }
+
+  .site-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .site-sub { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 2px; }
+
+  .green-rule {
+    width: 100%;
+    max-width: 560px;
+    height: 3px;
+    background: var(--green);
+    border-radius: 99px;
+    margin-bottom: 1.5rem;
+  }
+
+  .wrap { width: 100%; max-width: 560px; padding: 0 1rem; }
+
+  .mode-bar {
+    display: flex;
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 5px;
+    margin-bottom: 1.5rem;
+  }
+
+  .mode-btn {
+    flex: 1;
+    padding: 8px 0;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--muted);
+    transition: all .15s;
+  }
+
+  .mode-btn.active { background: var(--blue); color: #fff; }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: .75rem;
+  }
+
+  .prog-wrap {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-right: .75rem;
+  }
+
+  .prog-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 99px;
+    transition: width .3s ease;
+  }
+
+  .counter { font-size: 12px; color: var(--hint); font-weight: 500; white-space: nowrap; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--blue);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    cursor: pointer;
+    position: relative;
+    transition: border-color .2s, transform .15s;
+    user-select: none;
+  }
+
+  .card:hover { border-color: var(--blue-mid); }
+  .card:active { transform: scale(.99); }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--hint);
+  }
+
+  .card-body { font-size: 15px; color: var(--text); line-height: 1.7; flex: 1; }
+
+  .card-keywords { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .kw {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: var(--green-light);
+    color: var(--green-mid);
+  }
+
+  .card-reveal {
+    display: none;
+    background: var(--blue-light);
+    border-left: 3px solid var(--blue-mid);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    text-align: center;
+  }
+
+  .card-reveal .num {
+    font-size: 11px;
+    color: var(--blue-mid);
+    font-weight: 500;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .card-reveal .answer {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue);
+  }
+
+  .card.flipped .card-reveal { display: block; }
+
+  .flip-hint {
+    position: absolute;
+    bottom: 1rem;
+    right: 1.25rem;
+    font-size: 11px;
+    color: var(--hint);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 3px 10px;
+  }
+
+  .card.flipped .flip-hint { display: none; }
+
+  .nav-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    padding: 9px 18px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--muted);
+    transition: all .15s;
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    background: var(--blue-light);
+    border-color: var(--blue-mid);
+    color: var(--blue);
+  }
+
+  .nav-btn:disabled { opacity: .35; cursor: default; }
+
+  .nav-btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .nav-btn.primary:hover { background: var(--blue-hover); border-color: var(--blue-hover); }
+  .nav-btn.green { background: var(--green); color: #fff; border-color: var(--green); }
+  .nav-btn.green:hover { background: var(--green-mid); border-color: var(--green-mid); }
+  .spacer { flex: 1; }
+
+  .quiz-desc {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.7;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--blue);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+
+  .quiz-opt {
+    padding: 11px 16px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    background: var(--surface);
+    color: var(--text);
+    text-align: left;
+    transition: all .15s;
+  }
+
+  .quiz-opt:hover:not(.locked) { background: var(--blue-light); border-color: var(--blue-mid); color: var(--blue); }
+  .quiz-opt.correct { background: var(--success-bg); color: var(--success); border-color: var(--green); }
+  .quiz-opt.wrong { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+  .quiz-opt.reveal { background: var(--reveal-bg); color: var(--blue); border-color: var(--blue-mid); opacity: .7; }
+  .quiz-opt.locked { cursor: default; }
+
+  .feedback { font-size: 13px; font-weight: 500; min-height: 18px; margin-bottom: .75rem; }
+  .feedback.ok { color: var(--success); }
+  .feedback.fail { color: var(--danger); }
+
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--green);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .score-big { font-family: var(--font-display); font-size: 64px; font-weight: 700; color: var(--blue); line-height: 1; }
+  .score-denom { font-size: 26px; color: var(--hint); }
+  .score-label { font-size: 15px; color: var(--muted); margin-top: .75rem; line-height: 1.5; }
+
+  .scan-item { display: flex; gap: 14px; padding: .9rem 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .scan-num { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--blue); min-width: 26px; padding-top: 2px; }
+  .scan-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .scan-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .scan-kws { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="logo-pair">
+    <div class="bubble-green"></div>
+    <div class="bubble-blue-lt"></div>
+  </div>
+  <div>
+    <div class="site-title">Peer Support Canada</div>
+    <div class="site-sub">Competency Study Tool</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="green-rule"></div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('flash')">Flashcards</button>
+    <button class="mode-btn" onclick="setMode('quiz')">Quiz</button>
+    <button class="mode-btn" onclick="setMode('scan')">Scan all</button>
+  </div>
+
+  <div class="meta-row">
+    <div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+    <span class="counter" id="counter">1 / 11</span>
+  </div>
+
+  <div id="panel"></div>
+</div>
+
+<script>
+const SOURCE = [
+  {n:1,title:"Interpersonal Relations",desc:"Interacts in a manner that honours the dignity of others and strives to build positive respectful relationships. Strives to make others feel comfortable and conveys genuine interest in their peer. Even in a difficult or tense situation strives to maintain a level of respect and consideration for the other.",keys:["dignity","comfort","respect","relationships"]},
+  {n:2,title:"Demeanour",desc:"Is sensitive to what another might be feeling, demonstrates a capacity for nonjudgmental empathy, and responds from an equal, genuine, and sharing point of view. Selectively self-discloses own experience in a manner that ensures the relationship remains peer focused.",keys:["nonjudgmental","empathy","peer-focused","self-disclosure"]},
+  {n:3,title:"Communication",desc:"Listens with empathy and without judgement, holding their peers in unconditional high regard. Uses communication styles and skills to improve understanding and adapts the style and tone of communication to suit the listener and the situation. Communicates using recovery language and emphasizes the strengths of their peers.",keys:["recovery language","unconditional regard","adapt tone","strengths"]},
+  {n:4,title:"Critical Thinking",desc:"Listens with empathy and without judgement, holding their peers in unconditional high regard. Uses communication styles and skills to improve understanding and adapts the style and tone of communication to suit the listener and the situation. Communicates using recovery language and emphasizes the strengths of their peers.",keys:["recovery language","unconditional regard","adapt tone","strengths"]},
+  {n:5,title:"Hope",desc:"Operates from a sense of hope expressing confidence that others will be successful in their own personal journeys of recovery. Strives to model realistic optimism and a belief that even in difficult situations positive choices can be made.",keys:["recovery","optimism","confidence","positive choices"]},
+  {n:6,title:"Self-Management & Resiliency",desc:"Understands the importance of self-care and stress management and models the practices that work best for them to remain healthy while supporting others. Strives to maintain calm and diffuse stressful or challenging situations.",keys:["self-care","stress","calm","healthy"]},
+  {n:7,title:"Flexibility & Adaptability",desc:"Is open to new ideas, deals comfortably with ambiguity, and adjusts plans or behaviours to better suit a given situation. Is willing to be open-minded and compromises when needed.",keys:["ambiguity","open-minded","adjust","compromise"]},
+  {n:8,title:"Self-Awareness & Confidence",desc:"Interacts in a manner that demonstrates a balance of self-confidence with openness to the thoughts and opinions of others. Self-reflects and understands that personal thoughts and attitudes can influence their behaviour and actions.",keys:["self-reflect","balance","attitudes","openness"]},
+  {n:9,title:"Initiative & Commitment",desc:"Is dependable and carries tasks through to completion. Demonstrates good judgement knowing when insight or assistance should be requested from another and are trustworthy when working independently.",keys:["dependable","completion","trustworthy","judgement"]},
+  {n:10,title:"Teamwork",desc:"Shares knowledge, ideas and resources with team members in a cooperative and collaborative manner. Strives to fulfill their role and responsibility within the team while respecting the roles and responsibilities of the other team members.",keys:["collaborative","share","role","responsibility"]},
+  {n:11,title:"Continuous Learning & Development",desc:"Strives to approach life and work in a curious manner, identifies areas where personal growth may be helpful, and takes advantage of opportunities to learn and develop. Recognizes the value of on-going personal growth and skill development and maintains a connection with a peer support community as a resource to stay 'grounded' in the work of authentic peer support.",keys:["curious","growth","skill development","grounded"]}
+];
+
+let mode = 'flash';
+let flashOrder = SOURCE.map((_,i) => i);
+let flashIdx = 0, flipped = false;
+let quizOrder = [], quizQ = 0, quizScore = 0, quizTotal = 0, quizLocked = false;
+
+function shuffle(a) {
+  const b = [...a];
+  for (let i = b.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [b[i], b[j]] = [b[j], b[i]];
+  }
+  return b;
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['flash','quiz','scan'][i] === m);
+  });
+  flashIdx = 0; flipped = false;
+  if (m === 'quiz') {
+    quizOrder = shuffle([...Array(11).keys()]);
+    quizQ = 0; quizScore = 0; quizTotal = 0; quizLocked = false;
+  }
+  render();
+}
+
+function setProg(cur, tot) {
+  document.getElementById('prog').style.width = (cur / tot * 100) + '%';
+  document.getElementById('counter').textContent = cur + ' / ' + tot;
+}
+
+function render() {
+  const p = document.getElementById('panel');
+  if (mode === 'flash') renderFlash(p);
+  else if (mode === 'quiz') renderQuiz(p);
+  else renderScan(p);
+}
+
+function renderFlash(p) {
+  const c = SOURCE[flashOrder[flashIdx]];
+  setProg(flashIdx + 1, 11);
+  p.innerHTML = `
+    <div class="card${flipped ? ' flipped' : ''}" onclick="flipCard()">
+      <span class="card-label">which competency is this?</span>
+      <div class="card-body">${c.desc}</div>
+      <div class="card-keywords">${c.keys.map(k => `<span class="kw">${k}</span>`).join('')}</div>
+      <div class="card-reveal">
+        <div class="num">competency ${c.n}</div>
+        <div class="answer">${c.title}</div>
+      </div>
+      <span class="flip-hint">tap to reveal</span>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="go(-1)" ${flashIdx === 0 ? 'disabled' : ''}>← prev</button>
+      <span class="spacer"></span>
+      <button class="nav-btn" onclick="shuffleFlash()">shuffle</button>
+      <button class="nav-btn primary" onclick="go(1)" ${flashIdx === 10 ? 'disabled' : ''}>next →</button>
+    </div>`;
+}
+
+function flipCard() { flipped = !flipped; render(); }
+
+function go(d) {
+  flashIdx = Math.max(0, Math.min(10, flashIdx + d));
+  flipped = false;
+  render();
+}
+
+function shuffleFlash() {
+  flashOrder = shuffle(flashOrder);
+  flashIdx = 0; flipped = false; render();
+}
+
+function renderQuiz(p) {
+  if (quizQ >= 11) { renderScore(p); return; }
+  setProg(quizQ + 1, 11);
+  const ci = quizOrder[quizQ];
+  const correct = SOURCE[ci];
+  const others = shuffle([...Array(11).keys()].filter(i => i !== ci)).slice(0, 3);
+  const opts = shuffle([ci, ...others]);
+  p.innerHTML = `
+    <div class="quiz-desc">${correct.desc}</div>
+    <div class="quiz-options">
+      ${opts.map(i => `<button class="quiz-opt" onclick="checkAns(${i},${ci})" data-i="${i}">${SOURCE[i].title}</button>`).join('')}
+    </div>
+    <div class="feedback" id="fb"></div>
+    <div class="nav-row">
+      <button class="nav-btn green" onclick="shuffleQuiz()">shuffle order</button>
+      <span class="spacer"></span>
+      <button class="nav-btn primary" id="nxtq" style="display:none" onclick="nextQ()">next →</button>
+    </div>`;
+}
+
+function shuffleQuiz() {
+  quizOrder = shuffle([...Array(11).keys()]);
+  quizQ = 0; quizScore = 0; quizTotal = 0; quizLocked = false;
+  render();
+}
+
+function checkAns(chosen, correct) {
+  if (quizLocked) return;
+  quizLocked = true; quizTotal++;
+  document.querySelectorAll('.quiz-opt').forEach(b => b.classList.add('locked'));
+  const fb = document.getElementById('fb');
+  if (chosen === correct) {
+    document.querySelector(`[data-i="${chosen}"]`).classList.add('correct');
+    fb.textContent = 'correct!'; fb.className = 'feedback ok'; quizScore++;
+  } else {
+    document.querySelector(`[data-i="${chosen}"]`).classList.add('wrong');
+    document.querySelector(`[data-i="${correct}"]`).classList.add('reveal');
+    fb.textContent = 'not quite — correct answer highlighted above.';
+    fb.className = 'feedback fail';
+  }
+  document.getElementById('nxtq').style.display = 'inline-block';
+}
+
+function nextQ() { quizLocked = false; quizQ++; render(); }
+
+function renderScore(p) {
+  setProg(11, 11);
+  const pct = Math.round(quizScore / quizTotal * 100);
+  const msg = pct >= 90 ? "you're ready for tomorrow." : pct >= 70 ? "solid — one more round will lock it in." : "keep going — the repetition is working.";
+  p.innerHTML = `
+    <div class="score-card">
+      <div class="score-big">${quizScore}<span class="score-denom">/${quizTotal}</span></div>
+      <div class="score-label">${pct}% — ${msg}</div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="setMode('flash')">review flashcards</button>
+      <span class="spacer"></span>
+      <button class="nav-btn primary" onclick="setMode('quiz')">try again →</button>
+    </div>`;
+}
+
+function renderScan(p) {
+  setProg(11, 11);
+  document.getElementById('counter').textContent = 'all 11';
+  p.innerHTML = SOURCE.map(c => `
+    <div class="scan-item">
+      <span class="scan-num">${c.n}.</span>
+      <div>
+        <div class="scan-title">${c.title}</div>
+        <div class="scan-desc">${c.desc}</div>
+        <div class="scan-kws">${c.keys.map(k => `<span class="kw">${k}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+
+render();
+</script>
+</body>
+</html>
