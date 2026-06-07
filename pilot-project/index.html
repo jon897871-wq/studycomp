@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="./node_modules/gsap/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: 'IBM Plex Mono';
+        font-style: normal;
+        font-weight: 400;
+        font-display: block;
+        src: url('./capture/assets/fonts/IBMPlexMono-Regular.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'IBM Plex Mono';
+        font-style: normal;
+        font-weight: 500;
+        font-display: block;
+        src: url('./capture/assets/fonts/IBMPlexMono-Medium.woff2') format('woff2');
+      }
+    </style>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #1c1c1e;
+      }
+
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        background: #1c1c1e;
+      }
+
+      /* All timed cards share this base — centered, invisible until GSAP reveals */
+      .clip {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1440px;
+        text-align: center;
+        font-family: 'IBM Plex Mono', 'Courier New', monospace;
+        color: #f5f0e8;
+        opacity: 0;
+      }
+
+      .card--location {
+        font-size: 30px;
+        font-weight: 400;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .card--speaker {
+        font-size: 22px;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #777;
+      }
+
+      .card--quote-kernaghan {
+        font-size: 44px;
+        font-weight: 400;
+        line-height: 1.65;
+      }
+
+      /* The centerpiece — slightly larger to carry the weight */
+      .card--quote-flack {
+        font-size: 52px;
+        font-weight: 400;
+        line-height: 1.55;
+      }
+
+      .card--quote-response {
+        font-size: 38px;
+        font-weight: 400;
+        line-height: 1.65;
+      }
+
+      .card--source {
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="60"
+      data-width="1920"
+      data-height="1080"
+    >
+
+      <!-- 1. Location / Date — t=2 to t=7 -->
+      <div id="card-location"
+           class="clip card--location"
+           data-start="2"
+           data-duration="5"
+           data-track-index="1">
+        Ontario Legislature. May 26, 2026.
+      </div>
+
+      <!-- 2. Speaker label: Kernaghan — t=8 to t=11.5 -->
+      <div id="card-speaker-kernaghan"
+           class="clip card--speaker"
+           data-start="8"
+           data-duration="3.5"
+           data-track-index="1">
+        MPP Terence Kernaghan
+      </div>
+
+      <!-- 3. Kernaghan quote — t=12.5 to t=28.5 (12s read + 4s hold) -->
+      <div id="card-quote-kernaghan"
+           class="clip card--quote-kernaghan"
+           data-start="12.5"
+           data-duration="16"
+           data-track-index="1">
+        House of Hope in London has successfully helped move people from encampments
+        into housing, saving lives and saving the province $1.2&nbsp;million.
+        It's a proven program that works. They urgently need $1.3&nbsp;million
+        in matching provincial funding or House of Hope will close.
+      </div>
+
+      <!-- 4. Speaker label: Flack — t=29.5 to t=33.5 -->
+      <div id="card-speaker-flack"
+           class="clip card--speaker"
+           data-start="29.5"
+           data-duration="4"
+           data-track-index="1">
+        Minister Rob Flack
+      </div>
+
+      <!--
+        5. The centerpiece.
+        Appears t=34.5. Reader absorbs both lines by ~t=37.
+        5-second hold: t=37 to t=42. Card clears t=42.5.
+        "a great pilot project." sits alone on its own line — that is the shot.
+      -->
+      <div id="card-quote-flack"
+           class="clip card--quote-flack"
+           data-start="34.5"
+           data-duration="8"
+           data-track-index="1">
+        Indeed the House of Hope has been<br>
+        a great pilot project.
+      </div>
+
+      <!-- 6. Flack's response — t=43.5 to t=52.5 (4.5s read + 4.5s hold) -->
+      <div id="card-quote-response"
+           class="clip card--quote-response"
+           data-start="43.5"
+           data-duration="9"
+           data-track-index="1">
+        Get the service manager in London to take the priority
+        of $21.8&nbsp;million and fund the project.
+      </div>
+
+      <!-- 7. Source — t=53.5 to t=58.5 — composition ends at t=60 -->
+      <div id="card-source"
+           class="clip card--source"
+           data-start="53.5"
+           data-duration="5"
+           data-track-index="1">
+        Source: Ontario Hansard, May 26, 2026
+      </div>
+
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // All transitions are instant (no duration) — words just arrive.
+      // No easing, no fades. The silence is the editorial.
+      tl
+        // 1. Location
+        .set("#card-location",            { opacity: 1 }, 2)
+        .set("#card-location",            { opacity: 0 }, 7)
+
+        // 2. Kernaghan label
+        .set("#card-speaker-kernaghan",   { opacity: 1 }, 8)
+        .set("#card-speaker-kernaghan",   { opacity: 0 }, 11.5)
+
+        // 3. Kernaghan quote
+        .set("#card-quote-kernaghan",     { opacity: 1 }, 12.5)
+        .set("#card-quote-kernaghan",     { opacity: 0 }, 28.5)
+
+        // 4. Flack label
+        .set("#card-speaker-flack",       { opacity: 1 }, 29.5)
+        .set("#card-speaker-flack",       { opacity: 0 }, 33.5)
+
+        // 5. Flack quote — the centerpiece
+        //    5-second hold: reader finishes ~t=37, hold runs to ~t=42
+        .set("#card-quote-flack",         { opacity: 1 }, 34.5)
+        .set("#card-quote-flack",         { opacity: 0 }, 42.5)
+
+        // 6. Flack response
+        .set("#card-quote-response",      { opacity: 1 }, 43.5)
+        .set("#card-quote-response",      { opacity: 0 }, 52.5)
+
+        // 7. Source attribution
+        .set("#card-source",              { opacity: 1 }, 53.5)
+        .set("#card-source",              { opacity: 0 }, 58.5);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
